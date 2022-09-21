@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Model\PasswordReset;
+use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Mail;
-use App\Model\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Str;
@@ -20,7 +20,9 @@ class PasswordResetController extends Controller
             'email' => 'required|email',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $email = $request->email;
+
+        $user = User::where('email', $email)->first();
         if(!$user)
         {
             return response([
@@ -29,11 +31,22 @@ class PasswordResetController extends Controller
             ], 404);
         }
 
-        $token = Str::randon(60);
+        $token = Str::random(60);
         PasswordReset::create([
-            'email' => $request->email,
+            'email' => $email,
             'token' => $token,
             'created_at' => Carbon::now()
         ]);    
+
+        Mail::send('reset',['token' => $token], function (Message $message)use($email)
+    {
+        $message->subject('Reset Your Password');
+        $message->to($email);
+    });
+
+        return response([
+            'message' => 'Password Reset Email has been Sent. Please Check Your E-mail.',
+            'status' => 'success',
+        ],200);
     }   
 }
