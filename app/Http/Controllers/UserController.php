@@ -73,4 +73,27 @@ class UserController extends Controller
            'status' => 'success'  
         ], 200);
     }
+
+    public function logged_user() {
+        $loggeduser = auth()->user();
+        return response([
+            'user' => $loggeduser,
+           'message' => 'Logout User Data Retrived Successfully',
+           'status' => 'success'  
+        ], 200);
+    }
+
+    public function change_password(Request $request)
+    {
+       $request->validate([
+            'password' => 'required|confirmed',
+       ]);
+       $loggeduser = auth()->user();
+       $loggeduser->password = Hash::make($request->password);
+       $loggeduser->save();
+        return response([
+            'message' => 'Password Changed Successfully',
+            'status' => 'success'  
+        ], 200);
+    }
 }

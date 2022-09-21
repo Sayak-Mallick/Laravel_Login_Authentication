@@ -13,5 +13,6 @@ Route::post('/login', [UserController::class, 'login']);
 // Protected Route
 Route::middleware(['auth:sanctum'])->group(function() {
 Route::post('/logout', [UserController::class, 'logout']);
-
+Route::get('/loggeduser', [UserController::class,'logged_user']);
+Route::post('/changepassword', [UserController::class,'change_password']);
 });
